@@ -1,0 +1,11 @@
+{
+  "name": "y",
+  "version": "1.0.0",
+  "description": "express js, typescript and mongo db",
+  "main": "index.js",
+  "author": "msm",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
+}
