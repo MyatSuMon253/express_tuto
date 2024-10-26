@@ -1,6 +1,7 @@
 const express = require("express");
 const logger = require("./middleware");
 const morgan = require("morgan");
+const notFound = require("./notFound");
 
 const port = 5000;
 const app = express();
@@ -32,6 +33,8 @@ app.delete("/delete/:id", (req, res) => {
   todos.splice(id, 1);
   res.status(200).json({ data: todos });
 });
+
+app.use(notFound);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
