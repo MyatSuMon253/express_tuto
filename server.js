@@ -2,16 +2,18 @@ const express = require("express");
 const app = express();
 const port = 5000;
 
-// app level middleware
-app.use(express.json());
-
 // route level middleware
-app.get("/", (req, res) => {
+const logger = (req, res, next) => {
+  console.log(`logger: ${req.method} ${req.url}`);
+  next();
+};
+
+app.get("/", logger, (req, res) => {
   console.log(req.method, req.url);
   res.send("Home");
 });
 
-app.post("/about", (req, res) => {
+app.post("/about", logger, (req, res) => {
   console.log(req.method, req.url);
   res.send("About");
 });
