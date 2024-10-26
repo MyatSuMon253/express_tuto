@@ -1,19 +1,17 @@
 const express = require("express");
 const app = express();
 const port = 5000;
+const logger = require("./middleware");
 
-// route level middleware
-const logger = (req, res, next) => {
-  console.log(`logger: ${req.method} ${req.url}`);
-  next();
-};
+// app level middleware
+app.use(logger);
 
-app.get("/", logger, (req, res) => {
+app.get("/", (req, res) => {
   console.log(req.method, req.url);
   res.send("Home");
 });
 
-app.post("/about", logger, (req, res) => {
+app.post("/about", (req, res) => {
   console.log(req.method, req.url);
   res.send("About");
 });
