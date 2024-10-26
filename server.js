@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const notFound = require("./notFound");
 const AppError = require("./AppError");
 const errorHandler = require("./errorHandler");
+const { tryCatch } = require("./tryCatch");
 
 const port = 5000;
 const app = express();
@@ -18,8 +19,9 @@ app.get("/", (req, res) => {
   res.status(200).json({ data: todos });
 });
 
-app.post("/create", async (req, res, next) => {
-  try {
+app.post(
+  "/create",
+  tryCatch(async (req, res, next) => {
     const { task } = req.body;
     const user = getUser();
     if (!user) {
@@ -30,11 +32,8 @@ app.post("/create", async (req, res, next) => {
     }
     todos.push(task);
     res.status(201).json({ data: todos });
-  } catch (error) {
-    console.log(error.stack);
-    next(error);
-  }
-});
+  })
+);
 
 app.put("/update/:id", (req, res) => {
   try {
