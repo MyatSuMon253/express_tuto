@@ -5,6 +5,7 @@ const logger = require("./middleware");
 
 // app level middleware
 app.use(logger);
+app.use(express.static("./public"));
 
 app.get("/", (req, res) => {
   console.log(req.method, req.url);
