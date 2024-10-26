@@ -5,21 +5,32 @@ const morgan = require("morgan");
 const port = 5000;
 const app = express();
 
-// app level middleware
-app.use(logger);
-app.use(express.static("./public"));
+let todos = [];
 
-// third party middleware
-app.use(morgan("tiny"));
+app.use(express.json());
 
 app.get("/", (req, res) => {
-  console.log(req.method, req.url);
-  res.send("Home");
+  res.status(200).json({ data: todos });
 });
 
-app.post("/about", (req, res) => {
-  console.log(req.method, req.url);
-  res.send("About");
+app.post("/create", (req, res) => {
+  const task = req.body.task;
+  console.log(task);
+  todos.push(task);
+  res.status(201).json({ data: todos });
+});
+
+app.put("/update/:id", (req, res) => {
+  const id = req.params.id;
+  const updatedtask = req.body.task;
+  todos[id] = updatedtask;
+  res.status(200).json({ data: todos });
+});
+
+app.delete("/delete/:id", (req, res) => {
+  const id = req.params.id;
+  todos.splice(id, 1);
+  res.status(200).json({ data: todos });
 });
 
 app.listen(port, () => {
