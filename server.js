@@ -2,6 +2,8 @@ const express = require("express");
 const logger = require("./middleware");
 const morgan = require("morgan");
 const notFound = require("./notFound");
+const AppError = require("./AppError");
+const errorHandler = require("./errorHandler");
 
 const port = 5000;
 const app = express();
@@ -10,13 +12,19 @@ let todos = [];
 
 app.use(express.json());
 
+const getUser = () => undefined;
+
 app.get("/", (req, res) => {
   res.status(200).json({ data: todos });
 });
 
-app.post("/create", (req, res) => {
+app.post("/create", async (req, res, next) => {
   try {
     const { task } = req.body;
+    const user = getUser();
+    if (!user) {
+      throw new AppError("User not found");
+    }
     if (!task) {
       res.status(400).json({ message: "Please provide a task" });
     }
@@ -24,6 +32,7 @@ app.post("/create", (req, res) => {
     res.status(201).json({ data: todos });
   } catch (error) {
     console.log(error.stack);
+    next(error);
   }
 });
 
@@ -58,7 +67,7 @@ app.delete("/delete/:id", (req, res) => {
   }
 });
 
-app.use(notFound);
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
