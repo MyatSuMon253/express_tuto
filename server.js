@@ -1,5 +1,7 @@
 const express = require("express");
 const { connectDB, getDB } = require("./db/db");
+const notFound = require("./middleware/notFound");
+const { ObjectId } = require("mongodb");
 
 const port = 5000;
 const app = express();
@@ -8,10 +10,11 @@ connectDB()
   .then(() => {
     app.use(express.json());
 
+    const db = getDB();
+    const collection = db.collection("posts");
+
     app.get("/", async (req, res) => {
       try {
-        const db = getDB();
-        const collection = db.collection("posts");
         const result = await collection.find({}).toArray();
         res.status(200).json({ message: true, data: result });
       } catch (error) {}
@@ -19,9 +22,6 @@ connectDB()
 
     app.post("/", async (req, res) => {
       try {
-        const db = getDB();
-        const collection = await db.collection("posts");
-
         const post = req.body.post;
         const author = req.body.author;
         const { name, age } = author;
@@ -40,6 +40,30 @@ connectDB()
         console.log(error)
       }
     });
+
+    app.put("/update/:id", async (req, res) => {
+      try {
+        const id = new ObjectId(req.params.id)
+        const updatedData = req.body;
+        const result = await collection.updateOne({ _id: id }, { $set: updatedData });
+        res.status(200).json({ message: "Updated successfully", data: result });
+      } catch (error) {
+        console.log(error)
+      }
+    });
+
+    app.delete('/delete/:id', async(req, res)=>{
+      try {
+        const id = new ObjectId(req.query.id)
+        const result = await collection.deleteOne({_id: id})
+        res.status(200).json({message: 'Deleted successfully', data: result})
+      } catch (error) {
+        console.log(error)
+      }
+    } )
+
+    app.use(notFound)
+
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });
