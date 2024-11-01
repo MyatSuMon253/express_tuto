@@ -11,7 +11,6 @@ const app = express();
 connectDB()
   .then(() => {
     app.use(express.json());
-
     const db = getDB();
     const collection = db.collection("posts");
 
@@ -57,15 +56,21 @@ connectDB()
         if (!ObjectId.isValid(req.params.id)) {
           throw new NotFound(`PostId ${req.params.id} is not found`);
         }
+
         const id = new ObjectId(req.params.id);
         const updatedData = req.body;
         if (!!Object.values(updatedData).length) {
           throw new BadRequest("Updated data must not be empty");
         }
+
         const result = await collection.updateOne(
           { _id: id },
           { $set: updatedData }
         );
+        if (result.modifiedCount === 0) {
+          return res.status(404).json({ message: "Post is nothing change" });
+        }
+
         res.status(200).json({ message: "Updated successfully", data: result });
       } catch (error) {
         next(error);
@@ -74,8 +79,18 @@ connectDB()
 
     app.delete("/delete/:id", async (req, res, next) => {
       try {
-        const id = new ObjectId(req.query.id);
-        const result = await collection.deleteOne({ _id: id });
+        if (!ObjectId.isValid(req.params.id)) {
+          throw new NotFound(`PostId ${req.params.id} is not found`);
+        }
+        const posts = await collection.find({}).toArray();
+        const postId = new ObjectId(req.params.id);
+        const existId = posts.find((post) => post._id.toString() == postId);
+
+        if (!existId) {
+          throw new NotFound(`PostId ${req.params.id} is not found`);
+        }
+
+        const result = await collection.deleteOne({ _id: postId });
         res.status(200).json({ message: "Deleted successfully", data: result });
       } catch (error) {
         next(error);
