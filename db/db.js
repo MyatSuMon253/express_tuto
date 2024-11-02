@@ -1,7 +1,7 @@
+require("dotenv").config();
 const { MongoClient, ServerApiVersion } = require("mongodb");
-const uri =
-  "mongodb+srv://admin_user:Leco2uL3MsotRNQO@cluster0.h5s24.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-const dbName = "express_tuto";
+const uri = process.env.MONGO_URI;
+const dbName = process.env.DB_NAME;
 let dbInstance;
 
 async function connectDB() {
