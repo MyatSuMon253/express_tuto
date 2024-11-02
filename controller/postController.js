@@ -5,13 +5,24 @@ const { tryCatch } = require("../utils/tryCatch");
 exports.getPosts = tryCatch(async (req, res) => {
   const db = getDB();
   const collection = db.collection("posts");
-  const result = await collection.find({}).toArray();
+  const authorName = req.query.name;
+  const limit = Number(req.query.limit);
+
+  let result;
+  if (authorName) {
+    result = await collection
+      .aggregate([{ $match: { "author.name": { authorName } } }])
+      .toArray();
+  } else {
+    result = await collection.find({}).limit(limit).toArray();
+  }
   res.status(200).json({ message: true, data: result });
 });
 
 exports.setPost = tryCatch(async (req, res, next) => {
   const db = getDB();
   const collection = db.collection("posts");
+
   const post = req.body.post;
   if (!post) {
     throw new BadRequest("Post must not be empty");
