@@ -3,6 +3,19 @@ const { getDB } = require("../db/db");
 const { BadRequest, NotFound } = require("../utils/AppError");
 const { tryCatch } = require("../utils/tryCatch");
 
+exports.getOneAddress = tryCatch(async (req, res) => {
+  const db = getDB();
+  const collection = db.collection("address");
+
+  if (!ObjectId.isValid(req.params.id)) {
+    throw new NotFound(`Id ${req.params.id} is not found`);
+  }
+  const id = new ObjectId(req.params.id);
+
+  result = await collection.findOne(id);
+  res.status(200).json({ message: true, data: result });
+});
+
 exports.setAddress = tryCatch(async (req, res, next) => {
   const db = getDB();
   const collection = db.collection("address");

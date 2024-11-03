@@ -1,4 +1,3 @@
-const express = require("express");
 const jwt = require("jsonwebtoken");
 const { Unauthorized } = require("../utils/AppError");
 
@@ -10,7 +9,7 @@ exports.authenticate = (req, res, next) => {
     }
     jwt.verify(
       token.split(" ")?.[1],
-      process.env.SECRET_KEY,
+      process.env.JWT_SECRET,
       (err, decodedToken) => {
         console.log(decodedToken);
         if (err) {
