@@ -6,12 +6,13 @@ const {
   deletePost,
   getOnePost,
 } = require("../controller/postController");
+const { authenticate } = require("../middleware/authenticate");
 
 const postRouter = Router();
 
 postRouter.route("/").get(getPosts);
 postRouter.route("/:id").get(getOnePost);
-postRouter.route("/").post(setPost);
+postRouter.route("/").post(authenticate, setPost);
 postRouter.route("/update/:id").put(modifyPost);
 postRouter.route("/delete/:id").delete(deletePost);
 

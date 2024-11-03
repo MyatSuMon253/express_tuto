@@ -41,18 +41,11 @@ exports.setPost = tryCatch(async (req, res, next) => {
   if (!post) {
     throw new BadRequest("Post must not be empty");
   }
+  const userId = new ObjectId(req.userId)
 
-  const author = req.body.author;
-  const { name, age } = author;
-  if (!author || !name || !age) {
-    throw new BadRequest("Author name and age must not be empty");
-  }
   const newData = {
     post,
-    author: {
-      name,
-      age,
-    },
+    userId
   };
   const result = await collection.insertOne(newData);
   res.status(201).json({ message: "Created successfully", data: newData });
