@@ -1,8 +1,12 @@
 const { Router } = require("express");
-const { setAddress } = require("../controller/addressController");
+const {
+  setAddress,
+  modifyAddress,
+} = require("../controller/addressController");
 
 const addressRouter = Router();
 
-addressRouter.route("/create").get(setAddress);
+addressRouter.route("/create").post(setAddress);
+addressRouter.route("/update/:id").put(modifyAddress);
 
 module.exports = addressRouter;
