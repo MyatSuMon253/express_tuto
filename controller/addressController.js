@@ -3,6 +3,43 @@ const { getDB } = require("../db/db");
 const { BadRequest, NotFound } = require("../utils/AppError");
 const { tryCatch } = require("../utils/tryCatch");
 
+exports.getAddress = tryCatch(async (req, res) => {
+  const db = getDB();
+  const userCollection = db.collection("users");
+  const addressCollection = db.collection("address");
+  const userName = req.query.name;
+  const limit = Number(req.query.limit);
+  const userId = new ObjectId(req.userId);
+  const user = await userCollection.findOne({ _id: userId });
+  if (!user) {
+    throw new NotFound("User not found");
+  }
+  let result;
+  if (userName) {
+    // localfield => outside
+    // foreignField => common same
+    result = await userCollection
+      .aggregate([{ $match: { name: userName } }, {
+        $lookup: {
+          from: "address",
+          localField: "_id",
+          foreignField: "userId",
+          as: "user_address",
+        },
+      }, {
+        $project: {
+          _id: 1,
+          name: 1,
+          user_address: 1,
+        },
+      }])
+      .toArray();
+  } else {
+    result = await collection.find({}).limit(limit).toArray();
+  }
+  res.status(200).json({ message: true, data: result });
+});
+
 exports.getOneAddress = tryCatch(async (req, res) => {
   const db = getDB();
   const collection = db.collection("address");
