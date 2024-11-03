@@ -11,9 +11,15 @@ exports.setAddress = tryCatch(async (req, res, next) => {
     throw new BadRequest("Please provide all required fields");
   }
   const userId = req.userId;
+  const existingUser = await collection.findOne({
+    userId: new ObjectId(userId),
+  });
+  if (existingUser) {
+    throw new BadRequest("Address already exists for this user");
+  }
   const newAddress = {
     street,
-    city, 
+    city,
     state,
     userId,
   };
