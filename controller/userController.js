@@ -3,6 +3,7 @@ const { getDB } = require("../db/db");
 const { BadRequest, NotFound } = require("../utils/AppError");
 const { tryCatch } = require("../utils/tryCatch");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 exports.register = tryCatch(async (req, res, next) => {
   const db = getDB();
@@ -39,5 +40,12 @@ exports.login = tryCatch(async (req, res, next) => {
   if (!isPasswordValid) {
     throw new BadRequest("Invalid credentials");
   }
-  res.status(200).json({ message: "Login Successfully", data: user });
+  const token = generateToken(user._id);
+  user.token = token
+  console.log(token)
+  res.status(200).json({ message: "Login Successfully", token });
 });
+
+const generateToken = (userId) => {
+  return jwt.sign({ userId }, process.env.JWT_SECRET);
+};
