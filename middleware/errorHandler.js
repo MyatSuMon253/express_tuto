@@ -1,4 +1,4 @@
-const { AppError, BadRequest, NotFound } = require("../utils/AppError");
+const { AppError, BadRequest, NotFound, Unauthorized } = require("../utils/AppError");
 
 const errorHandler = (error, req, res, next) => {
   if (error instanceof AppError) {
@@ -8,6 +8,9 @@ const errorHandler = (error, req, res, next) => {
     return res.status(error.getCode()).json({ message: error.message });
   }
   if (error instanceof NotFound) {
+    return res.status(error.getCode()).json({ message: error.message });
+  }
+  if (error instanceof Unauthorized) {
     return res.status(error.getCode()).json({ message: error.message });
   }
   return res.status(500).json({ message: "Internal server error" });

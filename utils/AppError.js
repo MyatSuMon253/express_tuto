@@ -31,4 +31,15 @@ class NotFound extends AppError {
   }
 }
 
-module.exports = { AppError, BadRequest, NotFound };
+class Unauthorized extends AppError {
+  constructor(message) {
+    super(message);
+    this.message = message;
+  }
+
+  getCode() {
+    return 401;
+  }
+}
+
+module.exports = { AppError, BadRequest, NotFound, Unauthorized };

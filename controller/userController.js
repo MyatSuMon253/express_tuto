@@ -49,3 +49,9 @@ exports.login = tryCatch(async (req, res, next) => {
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET);
 };
+
+
+exports.logout = tryCatch(async (req, res, next) => {
+  const userId = req.userId;
+  res.status(200).json({ message: "Logout Successfully" });
+})
