@@ -3,20 +3,38 @@ const { getDB } = require("../db/db");
 const { BadRequest, NotFound } = require("../utils/AppError");
 const { tryCatch } = require("../utils/tryCatch");
 
-exports.getPosts = tryCatch(async (req, res) => {
+exports.getPost = tryCatch(async (req, res) => {
   const db = getDB();
-  const collection = db.collection("posts");
-  const authorName = req.query.name;
-  const limit = Number(req.query.limit);
-
-  let result;
-  if (authorName) {
-    result = await collection
-      .aggregate([{ $match: { "author.name": { authorName } } }])
-      .toArray();
-  } else {
-    result = await collection.find({}).limit(limit).toArray();
+  const userCollection = db.collection("users");
+  const userName = req.query.name;
+  const userId = new ObjectId(req.userId);
+  const user = await userCollection.findOne({ _id: userId });
+  if (!user) {
+    throw new NotFound(`User ${userName} is not found`);
   }
+
+  const result = await userCollection
+    .aggregate([
+      {
+        $match: { name },
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "userId",
+          as: "user_post",
+        },
+      },
+      {
+        $project: {
+          user_post: 1,
+          _id: 0,
+        },
+      },
+    ])
+    .toArray();
+
   res.status(200).json({ message: true, data: result });
 });
 
@@ -41,11 +59,11 @@ exports.setPost = tryCatch(async (req, res, next) => {
   if (!post) {
     throw new BadRequest("Post must not be empty");
   }
-  const userId = new ObjectId(req.userId)
+  const userId = new ObjectId(req.userId);
 
   const newData = {
     post,
-    userId
+    userId,
   };
   const result = await collection.insertOne(newData);
   res.status(201).json({ message: "Created successfully", data: newData });

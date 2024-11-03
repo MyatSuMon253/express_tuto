@@ -1,5 +1,5 @@
 const express = require("express");
-const { connectDB, getDB } = require("./db/db");
+const { connectDB } = require("./db/db");
 const notFound = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
 const postRouter = require("./routes/postRouter");
